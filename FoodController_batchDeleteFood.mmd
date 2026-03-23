@@ -1,0 +1,9 @@
+sequenceDiagram
+actor User
+User ->> FoodController : batchDeleteFood
+activate FoodController
+FoodController ->> FoodService : deleteAllFoods
+activate FoodService
+FoodService -->> FoodController : #32; 
+deactivate FoodService
+deactivate FoodController

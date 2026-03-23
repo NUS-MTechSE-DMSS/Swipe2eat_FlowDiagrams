@@ -1,0 +1,29 @@
+sequenceDiagram
+actor User
+User ->> FoodController : createFood
+activate FoodController
+FoodController ->> FoodService : createFood
+activate FoodService
+FoodService ->> FoodMapper : toEntity
+activate FoodMapper
+FoodMapper -->> FoodService : #32; 
+deactivate FoodMapper
+FoodService ->> Food : toString
+activate Food
+Food -->> FoodService : #32; 
+deactivate Food
+FoodService ->> Food : toString
+activate Food
+Food -->> FoodService : #32; 
+deactivate Food
+FoodService ->> FoodMapper : toDTO
+activate FoodMapper
+FoodMapper ->> FoodResponseDTO : toString
+activate FoodResponseDTO
+FoodResponseDTO -->> FoodMapper : #32; 
+deactivate FoodResponseDTO
+FoodMapper -->> FoodService : #32; 
+deactivate FoodMapper
+FoodService -->> FoodController : #32; 
+deactivate FoodService
+deactivate FoodController

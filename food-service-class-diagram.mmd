@@ -1,0 +1,202 @@
+classDiagram
+direction BT
+class Food {
+  + Food(UUID, String, String, String, Double, Double, String, Integer, String, LocalDateTime, LocalDateTime) 
+  + Food() 
+  - String restaurantName
+  - String name
+  - LocalDateTime createdAt
+  - String description
+  - Double rating
+  - String imageKey
+  - String cuisine
+  - UUID id
+  - Double price
+  - Integer spiceLevel
+  - LocalDateTime updatedAt
+  + equals(Object) boolean
+  + toString() String
+  # canEqual(Object) boolean
+  + hashCode() int
+   String name
+   String description
+   LocalDateTime updatedAt
+   LocalDateTime createdAt
+   String imageKey
+   Integer spiceLevel
+   String cuisine
+   Double rating
+   UUID id
+   Double price
+   String restaurantName
+}
+class FoodApplication {
+  + FoodApplication() 
+  + main(String[]) void
+}
+
+ %% ─── Controllers ───────────────────────────────────────────────────────
+ class FoodController {
+  + FoodController(FoodService, S3Service) 
+  + createFood(FoodRequestDTO) ResponseEntity~FoodResponseDTO~
+  + getFoodById(UUID) ResponseEntity~FoodResponseDTO~
+  + batchDeleteFood(String) ResponseEntity~String~
+  + updateFood(UUID, FoodRequestDTO) ResponseEntity~FoodResponseDTO~
+  + getFoods(List~String~, String, String) ResponseEntity~List~FoodResponseDTO~~
+  + deleteFood(UUID) ResponseEntity~String~
+  + batchCreateFood(List~FoodRequestDTO~) ResponseEntity~List~FoodResponseDTO~~
+  + requestUploadUrl(ImageUploadRequest) ResponseEntity~S3ImageUploadResponse~
+}
+
+%% ─── Mapper ────────────────────────────────────────────────────────
+class FoodMapper {
+  + FoodMapper() 
+  + mapSrcToDest(S, D) void
+  + listToDTO(List~Food~) List~FoodResponseDTO~
+  + listToEntity(List~FoodRequestDTO~) List~Food~
+  + toDTO(Food) FoodResponseDTO
+  + toEntity(FoodRequestDTO) Food
+}
+
+%% ─── Exceptions ────────────────────────────────────────────────────────
+class FoodNotFoundException {
+  + FoodNotFoundException(String) 
+}
+
+class GlobalExceptionHandler {
+  + GlobalExceptionHandler() 
+  + handleConstraintViolationException(ConstraintViolationException) ResponseEntity~Map~String, String~~
+  + handleFoodNotFoundException(FoodNotFoundException) ResponseEntity~Map~String, String~~
+  + handleValidationException(MethodArgumentNotValidException) ResponseEntity~Map~String, String~~
+}
+
+%% ─── Respository ───────────────────────────────────────────────────────
+
+class FoodRepository {
+<<Interface>>
+  + searchFoods(Double, Double, boolean, List~String~, Integer) List~Food~
+}
+
+%% ─── DTO ────────────────────────────────────────────────────────────
+
+class FoodRequestDTO {
+  + FoodRequestDTO(String, String, String, Double, Double, String, Integer, String) 
+  + FoodRequestDTO() 
+  - String cuisine
+  - String name
+  - Double price
+  - Double rating
+  - String description
+  - String imageKey
+  - Integer spiceLevel
+  - String restaurantName
+  + toString() String
+  + equals(Object) boolean
+  + hashCode() int
+  # canEqual(Object) boolean
+   String name
+   String description
+   String imageKey
+   Integer spiceLevel
+   String cuisine
+   Double rating
+   Double price
+   String restaurantName
+}
+
+class FoodResponseDTO {
+  + FoodResponseDTO(String, String, String, String, Double, Double, String, Integer, String, String, String) 
+  + FoodResponseDTO() 
+  - String description
+  - String id
+  - String name
+  - Integer spiceLevel
+  - Double price
+  - String createdAt
+  - String cuisine
+  - String updatedAt
+  - Double rating
+  - String imageKey
+  - String restaurantName
+  + equals(Object) boolean
+  # canEqual(Object) boolean
+  + toString() String
+  + hashCode() int
+   String name
+   String description
+   String imageKey
+   Integer spiceLevel
+   String cuisine
+   Double rating
+   Double price
+   String createdAt
+   String id
+   String restaurantName
+   String updatedAt
+}
+
+class ImageUploadRequest {
+  + ImageUploadRequest(String) 
+  + imageKey() String
+}
+
+class PriceRange {
+  + PriceRange(Double, Double) 
+  + min() Double
+  + max() Double
+}
+
+class S3ImageUploadResponse {
+  + S3ImageUploadResponse(String, String) 
+  + uploadUrl() String
+  + imageKey() String
+}
+
+%% ─── Services ────────────────────────────────────────────────────────
+
+class FoodService {
+  + FoodService(FoodRepository, FoodMapper, List~String~) 
+  + updateFood(UUID, FoodRequestDTO) FoodResponseDTO
+  + getFoods(List~String~, String, Integer) List~FoodResponseDTO~
+  + getFoodById(UUID) FoodResponseDTO
+  - resolvePriceRange(String) PriceRange
+  + createFood(FoodRequestDTO) FoodResponseDTO
+  + deleteAllFoods() void
+  + batchCreateFood(List~FoodRequestDTO~) List~FoodResponseDTO~
+  + deleteFood(UUID) void
+}
+
+class S3Service {
+  + S3Service(S3Presigner) 
+  + generateUploadUrl(String) String
+}
+
+%% ─── Configurations ────────────────────────────────────────────────────
+
+class JpaConfig {
+  + JpaConfig() 
+}
+class ModelMapperConfig {
+  + ModelMapperConfig() 
+  + modelMapper() ModelMapper
+}
+
+class S3Config {
+  + S3Config() 
+  + s3Presigner() S3Presigner
+}
+
+class WebConfig {
+  + WebConfig() 
+  + corsFilter() FilterRegistrationBean~CorsFilter~
+}
+
+%% ─── Relationships ─────────────────────────────────────────────────────
+
+FoodController "1" *--> "foodService 1" FoodService 
+FoodController  ..>  S3ImageUploadResponse : «create»
+FoodController "1" *--> "s3Service 1" S3Service 
+FoodService "1" *--> "foodMapper 1" FoodMapper 
+FoodService  ..>  FoodNotFoundException : «create»
+FoodService "1" *--> "foodRepository 1" FoodRepository 
+FoodService  ..>  PriceRange : «create»

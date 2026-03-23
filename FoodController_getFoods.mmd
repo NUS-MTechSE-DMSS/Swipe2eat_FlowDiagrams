@@ -1,0 +1,33 @@
+sequenceDiagram
+actor User
+User ->> FoodController : getFoods
+activate FoodController
+FoodController ->> FoodService : getFoods
+activate FoodService
+FoodService ->> FoodService : resolvePriceRange
+activate FoodService
+FoodService ->> PriceRange : new
+activate PriceRange
+PriceRange -->> FoodService : #32; 
+deactivate PriceRange
+FoodService -->> FoodService : #32; 
+deactivate FoodService
+FoodService ->> FoodRepository : String::toLowerCase
+activate FoodRepository
+FoodRepository -->> FoodService : #32; 
+deactivate FoodRepository
+FoodService ->> FoodMapper : listToDTO
+activate FoodMapper
+FoodMapper ->> FoodMapper : toDTO
+activate FoodMapper
+FoodMapper ->> FoodResponseDTO : toString
+activate FoodResponseDTO
+FoodResponseDTO -->> FoodMapper : #32; 
+deactivate FoodResponseDTO
+FoodMapper -->> FoodMapper : #32; 
+deactivate FoodMapper
+FoodMapper -->> FoodService : #32; 
+deactivate FoodMapper
+FoodService -->> FoodController : #32; 
+deactivate FoodService
+deactivate FoodController

@@ -1,0 +1,17 @@
+sequenceDiagram
+actor User
+User ->> FoodController : deleteFood
+activate FoodController
+FoodController ->> FoodService : deleteFood
+activate FoodService
+FoodService ->> FoodService : () -&gt;
+activate FoodService
+FoodService ->> FoodNotFoundException : new
+activate FoodNotFoundException
+FoodNotFoundException -->> FoodService : #32; 
+deactivate FoodNotFoundException
+FoodService -->> FoodService : #32; 
+deactivate FoodService
+FoodService -->> FoodController : #32; 
+deactivate FoodService
+deactivate FoodController

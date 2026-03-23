@@ -1,0 +1,13 @@
+sequenceDiagram
+actor User
+User ->> FoodController : requestUploadUrl
+activate FoodController
+FoodController ->> S3Service : generateUploadUrl
+activate S3Service
+S3Service -->> FoodController : #32; 
+deactivate S3Service
+FoodController ->> S3ImageUploadResponse : new
+activate S3ImageUploadResponse
+S3ImageUploadResponse -->> FoodController : #32; 
+deactivate S3ImageUploadResponse
+deactivate FoodController
